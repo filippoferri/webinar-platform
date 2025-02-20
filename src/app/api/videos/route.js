@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
 import { NextResponse } from 'next/server'
-
-const prisma = new PrismaClient()
+import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
@@ -19,7 +17,6 @@ export async function POST(request) {
   try {
     const videoData = await request.json()
     
-    // Ensure texts and popups are stringified if they're arrays/objects
     const processedData = {
       ...videoData,
       texts: Array.isArray(videoData.texts) 
@@ -47,7 +44,6 @@ export async function PUT(request) {
   try {
     const videoData = await request.json()
     
-    // Ensure texts and popups are stringified if they're arrays/objects
     const processedData = {
       ...videoData,
       texts: Array.isArray(videoData.texts) 
