@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-export default function Countdown() {
+function CountdownContent() {
   const searchParams = useSearchParams();
   const videoId = searchParams.get("videoId");
   const router = useRouter();
@@ -146,5 +147,13 @@ export default function Countdown() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Countdown() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CountdownContent />
+    </Suspense>
   );
 }
