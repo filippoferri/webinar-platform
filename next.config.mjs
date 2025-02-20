@@ -8,15 +8,7 @@ const nextConfig = {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     return config;
   },
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/debug',
-        permanent: false,
-      },
-    ];
-  },
+  // Remove redirects for now
 };
 
 export default nextConfig;
