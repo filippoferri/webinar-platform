@@ -1,0 +1,57 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,300..900;1,300..900&display=swap');
+
+/* Tailwind Base Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define root variables for color themes */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-body: 'Montserrat', sans-serif;
+  --font-headings: 'Playfair Display', serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* Apply global body styles */
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+}
+
+/* Optional: Utility classes for font usage */
+.font-headings {
+  font-family: var(--font-headings);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.button {
+  background-color: #0e161c;
+  padding: 20px 40px;
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: white;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #1a2a34; /* Optional hover effect */
+}
