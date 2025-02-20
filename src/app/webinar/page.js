@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import { parseJson } from '@/utils/parseJson';
 import PollComponent from "../components/PollComponent";
 import OfferComponent from "../components/OfferComponent";
 
@@ -30,22 +31,27 @@ export default function Webinar() {
       try {
         const response = await fetch(`/api/videos`);
         if (!response.ok) throw new Error("Failed to fetch video data");
-  
+
         const data = await response.json();
         const selectedVideo = data.find((vid) => vid.id.toString() === videoId);
         if (!selectedVideo) throw new Error("Video ID not found in API");
-  
+
         setVideo(selectedVideo);
         setVideoDuration(selectedVideo.duration);
-  
-        // Ensure popups is always an array
-        setPopups(Array.isArray(selectedVideo.popups) ? selectedVideo.popups : []);
-  
+
+        // Use parseJson to ensure popups is correctly parsed
+        const parsedPopups = parseJson(selectedVideo.popups);
+        
+        // Debug logging
+        console.log("Parsed Popups:", parsedPopups);
+        
+        setPopups(parsedPopups);
+
       } catch (error) {
         console.error("Error fetching video data:", error);
       }
     };
-  
+
     if (videoId) fetchVideo();
   }, [videoId]);
 
@@ -74,6 +80,7 @@ export default function Webinar() {
           const popupToShow = popups.find(p => Math.floor(p.time) === prev);
   
           if (popupToShow) {
+            console.log("Popup to show:", popupToShow);
             setActivePopup(popupToShow);
   
             if (popupToShow.type === "poll") {
@@ -87,8 +94,8 @@ export default function Webinar() {
                 setActivePopup(null);
                 setShowResults(false);
               }, 25000);
-            } else {
-              // For non-poll popups (e.g., offers), close after 15 seconds
+            } else if (popupToShow.type === "offer") {
+              // For offer popups, close after 15 seconds
               setTimeout(() => {
                 setActivePopup(null);
               }, 15000);

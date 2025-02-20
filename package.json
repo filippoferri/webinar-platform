@@ -11,9 +11,11 @@
   "dependencies": {
     "@codemirror/lang-json": "^6.0.1",
     "@next/font": "^14.2.15",
+    "@prisma/client": "^6.4.0",
     "@uiw/codemirror-theme-dracula": "^4.23.7",
     "@uiw/react-codemirror": "^4.23.7",
     "next": "15.1.6",
+    "prisma": "^6.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

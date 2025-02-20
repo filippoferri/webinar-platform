@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import JsonEditor from "../components/JsonEditor";
+import { parseTexts } from '@/utils/parseTexts';
+import { parseJson } from '@/utils/parseJson';
 
 export default function Admin() {
   const sampleJson = `[
@@ -102,32 +104,25 @@ export default function Admin() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-
+  
     try {
-      let parsedPopups;
-      try {
-        parsedPopups = JSON.parse(videoDetails.popups);
-      } catch (jsonError) {
-        throw new Error("Invalid JSON format. Please check your input.");
-      }
-
       const videoData = {
         ...videoDetails,
         duration: parseInt(videoDetails.duration, 10),
-        popups: parsedPopups,
+        popups: parseJson(videoDetails.popups),
       };
-
+  
       const method = editMode ? "PUT" : "POST";
       const response = await fetch("/api/videos", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editMode ? { id: editingVideoId, ...videoData } : videoData),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       resetForm();
       fetchVideos();
     } catch (error) {
@@ -143,7 +138,10 @@ export default function Admin() {
     setEditingVideoId(video.id);
     setVideoDetails({
       ...video,
-      popups: JSON.stringify(video.popups, null, 2),
+      // Use parseTexts to ensure texts is always an array
+      texts: parseTexts(video.texts),
+      // Use parseJson to handle popups formatting
+      popups: JSON.stringify(parseJson(video.popups), null, 2),
     });
     setIsFormVisible(true);
   };

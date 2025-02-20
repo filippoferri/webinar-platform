@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { parseTexts } from '@/utils/parseTexts';
 
 export default function Join() {
   const searchParams = useSearchParams();
@@ -14,6 +15,7 @@ export default function Join() {
     name: "",
     email: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter(); // For navigation
 
   const togglePopup = () => setShowPopup(!showPopup);
@@ -23,19 +25,35 @@ export default function Join() {
     const fetchVideo = async () => {
       try {
         const response = await fetch(`/api/videos`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch videos: ${response.status}`);
-        }
+        if (!response.ok) throw new Error("Failed to fetch video data");
+
         const data = await response.json();
         const selectedVideo = data.find((vid) => vid.id.toString() === videoId);
+        
+        if (!selectedVideo) {
+          throw new Error("Video not found");
+        }
+
         setVideo(selectedVideo);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching video:", error);
+        setIsLoading(false);
       }
     };
 
     if (videoId) fetchVideo();
   }, [videoId]);
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
+
+  if (!video) {
+    return <div className="flex justify-center items-center min-h-screen">Video not found</div>;
+  }
+
+  const parsedTexts = parseTexts(video?.texts || []);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -89,10 +107,6 @@ export default function Join() {
     }
   };
 
-  if (!video) {
-    return <p>Sto caricando la pagina...</p>; // Show a loading state while fetching data
-  }
-
   // Calculate event dates and times based on video time
   const now = new Date();
   const videoDate = new Date(); // Use today's date with video time
@@ -144,10 +158,10 @@ export default function Join() {
           <h2 className="text-l text-black mb-6">{video.subtitle}</h2>
           <hr />
           <h3 className="mb-4 mt-8">In questa masterclass, imparerai:</h3>
-          <ul className="list-none pl-5 space-y-2 mb-8">
-            {(video.texts || []).map((text, index) => (
+          <ul className="list-disc pl-5 space-y-2 mb-8">
+            {(parsedTexts || []).map((text, index) => (
               <li key={index} className="text-black">
-                <span className="text-accent">✔</span> {text}
+                {text}
               </li>
             ))}
           </ul>
@@ -169,7 +183,7 @@ export default function Join() {
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full relative">
             {/* Popup Header */}
             <div className="bg-accent text-white p-6 rounded-t-lg flex justify-between items-center">
-              <h2 className="text-lg font-bold">Filippo Ferri</h2>
+              <h2 className="text-lg font-bold">Conduce: Filippo Ferri</h2>
               <button
                 onClick={togglePopup}
                 className="text-white text-xl font-bold focus:outline-none"
@@ -184,7 +198,7 @@ export default function Join() {
             <div className="p-6">
 
               <h3 className="mt-4 mb-8 font-bold text-center text-2xl">
-                {video.title}: {video.subtitle}
+                {video.title}
               </h3>
 
               <form onSubmit={handleRegister}>

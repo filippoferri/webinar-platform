@@ -1,61 +1,90 @@
-let videos = []; // In-memory storage for videos
+import { PrismaClient } from '@prisma/client'
+import { NextResponse } from 'next/server'
+
+const prisma = new PrismaClient()
 
 export async function GET() {
-  // Fetch all videos
-  return new Response(JSON.stringify(videos), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    const videos = await prisma.video.findMany()
+    return NextResponse.json(videos, { status: 200 })
+  } catch (error) {
+    return NextResponse.json({ 
+      error: 'Failed to fetch videos', 
+      details: error.message 
+    }, { status: 500 })
+  }
 }
 
 export async function POST(request) {
-  // Add a new video
-  const newVideo = await request.json();
-  newVideo.id = Date.now(); // Assign a unique ID
-  videos.push(newVideo);
+  try {
+    const videoData = await request.json()
+    
+    // Ensure texts and popups are stringified if they're arrays/objects
+    const processedData = {
+      ...videoData,
+      texts: Array.isArray(videoData.texts) 
+        ? JSON.stringify(videoData.texts) 
+        : videoData.texts,
+      popups: typeof videoData.popups === 'object' 
+        ? JSON.stringify(videoData.popups) 
+        : videoData.popups
+    }
 
-  return new Response(JSON.stringify({ message: "Video added successfully!" }), {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
-  });
+    const video = await prisma.video.create({
+      data: processedData
+    })
+
+    return NextResponse.json(video, { status: 201 })
+  } catch (error) {
+    return NextResponse.json({ 
+      error: 'Failed to create video', 
+      details: error.message 
+    }, { status: 500 })
+  }
 }
 
 export async function PUT(request) {
-  // Update an existing video
-  const updatedVideo = await request.json();
-  const index = videos.findIndex((video) => video.id === updatedVideo.id);
+  try {
+    const videoData = await request.json()
+    
+    // Ensure texts and popups are stringified if they're arrays/objects
+    const processedData = {
+      ...videoData,
+      texts: Array.isArray(videoData.texts) 
+        ? JSON.stringify(videoData.texts) 
+        : videoData.texts,
+      popups: typeof videoData.popups === 'object' 
+        ? JSON.stringify(videoData.popups) 
+        : videoData.popups
+    }
 
-  if (index === -1) {
-    return new Response(JSON.stringify({ message: "Video not found!" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    const video = await prisma.video.update({
+      where: { id: videoData.id },
+      data: processedData
+    })
+
+    return NextResponse.json(video, { status: 200 })
+  } catch (error) {
+    return NextResponse.json({ 
+      error: 'Failed to update video', 
+      details: error.message 
+    }, { status: 500 })
   }
-
-  videos[index] = updatedVideo;
-
-  return new Response(JSON.stringify({ message: "Video updated successfully!" }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
 }
 
 export async function DELETE(request) {
-  // Delete a video
-  const { id } = await request.json();
-  const index = videos.findIndex((video) => video.id === id);
+  try {
+    const { id } = await request.json()
+    
+    const video = await prisma.video.delete({
+      where: { id }
+    })
 
-  if (index === -1) {
-    return new Response(JSON.stringify({ message: "Video not found!" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(video, { status: 200 })
+  } catch (error) {
+    return NextResponse.json({ 
+      error: 'Failed to delete video', 
+      details: error.message 
+    }, { status: 500 })
   }
-
-  videos.splice(index, 1);
-
-  return new Response(JSON.stringify({ message: "Video deleted successfully!" }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
 }
