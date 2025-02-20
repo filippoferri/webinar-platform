@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-      turboMode: false, // Disable Turbopack (optional)
-    },
-  };
-  
-  export default nextConfig; // ✅ Fix: Use ES Module syntax
+  experimental: {
+    // Remove turboMode if it's causing issues
+  },
+  // Add any other configurations you need
+};
+
+export default nextConfig;

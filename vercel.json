@@ -1,23 +1,15 @@
-    {
-  "version": 2,
-  "builds": [
-    {
-      "src": "prisma/generate",
-      "use": "@prismicio/vercel-builds"
-    },
-    {
-      "src": "npx prisma generate",
-      "use": "@vercel/static-build"
-    },
-    {
-      "src": "npx next build",
-      "use": "@vercel/static-build"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "index.html"
-    }
-  ]
-}
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/"
+      }
+    ]
+  }
